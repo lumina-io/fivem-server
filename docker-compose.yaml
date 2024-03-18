@@ -7,6 +7,9 @@ services:
     image: ghcr.io/laica-lunasys/fivem-server:latest
     container_name: "fivem-server"
     restart: "unless-stopped"
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "30120:30120"
       - "30120:30120/udp"
