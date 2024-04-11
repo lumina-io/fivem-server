@@ -5,7 +5,7 @@ RUN apt-get update && \
     wget curl xz-utils
 
 WORKDIR /app/fivem
-RUN wget https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/7669-5e71f91d7bd846d8eb059c6a7a0db79f16e9d601/fx.tar.xz && \
+RUN wget https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/7878-37639cddcb2e5b0ef05f96d5a482b236b7349a1e/fx.tar.xz && \
     tar xvf ./fx.tar.xz
 
 COPY ./template/fivem-server/start.sh /app/fivem/start.sh
