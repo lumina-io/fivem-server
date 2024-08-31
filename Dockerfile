@@ -1,11 +1,13 @@
 FROM debian:bookworm
 
+ARG FIVEM_ARTIFACT_URL="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/9635-0776d79840adc87a90786a4ad9ad9b12dacb8886/fx.tar.xz"
+
 RUN apt-get update && \
     apt-get install -yqq \
     wget curl xz-utils
 
 WORKDIR /app/fivem
-RUN wget https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/7969-55dab4e102a780a94c0f3cfa54fd2e6a0c069f89/fx.tar.xz && \
+RUN wget $FIVEM_ARTIFACT_URL && \
     tar xvf ./fx.tar.xz
 
 COPY ./template/fivem-server/start.sh /app/fivem/start.sh
