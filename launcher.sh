@@ -20,7 +20,7 @@ function _start() {
     _preexec
 
     echo ":: Starting container..."
-    docker-compose up --build
+    docker compose up --build
 
     #echo ":: Attach console (exit: Ctrl+P, Ctrl+Q)"
     #docker start -ia "${CONTAINER_NAME}"
@@ -28,7 +28,7 @@ function _start() {
 
 function _stop() {
     echo ":: Stopping container..."
-    docker-compose down
+    docker compose down
 }
 
 if [ "$1" = "start" ]; then
