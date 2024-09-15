@@ -5,6 +5,7 @@ export SERVER_ID="lumina"
 export SERVER_PATH="/app/fivem/txData/${SERVER_ID}"
 
 # Database Config
+export MARIADB_VERSION="11.5.2"
 export MYSQL_ROOT_PASSWORD="nq89puy34tv23c08r9"
 export MYSQL_DATABASE="lumina_gta"
 export MYSQL_USER="app"

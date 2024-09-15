@@ -20,7 +20,7 @@ services:
       TXADMIN_PORT: 40120
 
   mariadb:
-    image: mariadb:11.5.2
+    image: mariadb:${MARIADB_VERSION:-11.5.2}
     container_name: "fivem-mariadb"
     restart: "unless-stopped"
     network_mode: "host"
