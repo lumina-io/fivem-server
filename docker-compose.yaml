@@ -24,8 +24,6 @@ services:
     container_name: "fivem-mariadb"
     restart: "unless-stopped"
     network_mode: "host"
-    #ports:
-    #  - "3306:3306"
     command: ["--port", "${MYSQL_PORT}"]
     volumes:
       - ./local/mysql:/var/lib/mysql

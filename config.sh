@@ -1,4 +1,5 @@
 # Server Config
+export USE_DEV="false"
 
 ## NOTE: DO NOT EDIT (use for directory name)
 export SERVER_ID="lumina"

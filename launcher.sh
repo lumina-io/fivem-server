@@ -20,7 +20,12 @@ function _start() {
     _preexec
 
     echo ":: Starting container..."
-    docker compose up --build
+    if [ "$USE_DEV" = "true" ]; then
+        echo ":: USE_DEV enabled."
+        docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build
+    else
+        docker compose up --build
+    fi
 
     #echo ":: Attach console (exit: Ctrl+P, Ctrl+Q)"
     #docker start -ia "${CONTAINER_NAME}"
@@ -31,6 +36,11 @@ function _stop() {
     docker compose down
 }
 
+function _build() {
+    echo ":: Building image..."
+    docker compose build --no-cache
+}
+
 if [ "$1" = "start" ]; then
     _start
 elif [ "$1" = "stop" ]; then
@@ -38,7 +48,9 @@ elif [ "$1" = "stop" ]; then
 elif [ "$1" = "restart" ]; then
     _stop
     _start
+elif [ "$1" = "build" ]; then
+    _build
 else
-    echo "Usage: launcher <start|stop|restart>"
+    echo "Usage: launcher <start|stop|restart|build>"
     exit 1
 fi
