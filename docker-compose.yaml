@@ -4,11 +4,15 @@ services:
     container_name: "fivem-server"
     restart: "unless-stopped"
     network_mode: "host"
+    tty: true
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - ./local/txData:/app/fivem/txData
+    depends_on:
+      mariadb:
+        condition: service_healthy
     environment:
       TZ: "Asia/Tokyo"
       # !!!
@@ -18,6 +22,8 @@ services:
       UID: "${USER_ID:-0}"
       GID: "${GROUP_ID:-0}"
       TXADMIN_PORT: 40120
+      DIRECT: "${DIRECT:-false}"
+      DIRECT_DIR: "${SERVER_PATH}"
 
   mariadb:
     image: mariadb:${MARIADB_VERSION:-11.5.2}
@@ -39,6 +45,12 @@ services:
       MARIADB_DATABASE: "${MYSQL_DATABASE}"
       MARIADB_USER: "${MYSQL_USER}"
       MARIADB_PASSWORD: "${MYSQL_PASSWORD}"
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: "30s"
+      timeout: "5s"
+      retries: 5
+      start_period: "10s"
     # Copy-pasted from https://github.com/docker-library/mariadb/issues/94
     #healthcheck:
     #  test: ["CMD", "mysqladmin", "ping", "--silent",  "--user", "${MYSQL_USER}", "--password", "${MYSQL_PASSWORD}"]

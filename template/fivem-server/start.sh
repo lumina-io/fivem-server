@@ -29,4 +29,10 @@ rewriteGlobal /app/fivem/txData
 
 # Start Server
 cd ${_base}
-bash ./run.sh +set txAdminPort ${TXADMIN_PORT:-40120}
+
+if [ "$DIRECT" == "true" ]; then
+    cd $DIRECT_DIR
+    bash ${_base}/run.sh +exec server.cfg
+else
+    bash ./run.sh +set txAdminPort ${TXADMIN_PORT:-40120}
+fi
