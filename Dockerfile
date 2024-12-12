@@ -1,6 +1,8 @@
 FROM debian:bookworm
 
 ARG FIVEM_ARTIFACT_URL="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/"
+ARG USER_ID='0'
+ARG GROUP_ID='0'
 
 RUN apt-get update && \
     apt-get install -yqq \
@@ -8,6 +10,10 @@ RUN apt-get update && \
 
 RUN curl -sSL https://bit.ly/install-xq | bash && \
     mv /usr/local/bin/xq /usr/bin/xq
+
+# Ensure user
+RUN useradd app --uid ${USER_ID} -U -s /bin/bash
+USER app
 
 WORKDIR /app/fivem
 

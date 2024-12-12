@@ -8,11 +8,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        USER_ID: ${USER_ID:-0}
+        GROUP_ID: ${GROUP_ID:-0}
     volumes:
       - ./local/txData:/app/fivem/txData
     depends_on:
       mariadb:
         condition: service_healthy
+    user: "${USER_ID:-0}:${GROUP_ID:-0}"
     environment:
       TZ: "Asia/Tokyo"
       # !!!
