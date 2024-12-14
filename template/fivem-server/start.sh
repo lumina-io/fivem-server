@@ -25,7 +25,7 @@ rewriteGlobal() {
 }
 
 
-rewriteGlobal /app/fivem/txData
+#rewriteGlobal /app/fivem/txData
 
 # Start Server
 cd ${_base}
