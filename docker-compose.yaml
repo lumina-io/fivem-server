@@ -26,6 +26,7 @@ services:
       UID: "${USER_ID:-0}"
       GID: "${GROUP_ID:-0}"
       TXADMIN_PORT: 40120
+      SERVER_PATH: "${SERVER_PATH}"
       DIRECT: "${DIRECT:-false}"
       DIRECT_DIR: "${SERVER_PATH}"
 

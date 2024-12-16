@@ -27,6 +27,14 @@ rewriteGlobal() {
 
 #rewriteGlobal /app/fivem/txData
 
+if [ -e "${SERVER_PATH}" ]; then
+    cd ${SERVER_PATH}
+
+    if [ -e "Makefile" ]; then
+        make generate-inventory
+    fi
+fi
+
 # Start Server
 cd ${_base}
 
