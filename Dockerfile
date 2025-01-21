@@ -6,7 +6,7 @@ ARG GROUP_ID='0'
 
 RUN apt-get update && \
     apt-get install -yqq \
-    wget curl xz-utils make lua5.4
+    wget curl xz-utils make git lua5.4
 
 RUN curl -sSL https://bit.ly/install-xq | bash && \
     mv /usr/local/bin/xq /usr/bin/xq
