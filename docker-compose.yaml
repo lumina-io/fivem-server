@@ -30,6 +30,15 @@ services:
       DIRECT: "${DIRECT:-false}"
       DIRECT_DIR: "${SERVER_PATH}"
 
+      DATABASE_URL: "${DATABASE_URL}"
+      FXSERVER_LICENSE_KEY: "${FXSERVER_LICENSE_KEY}"
+      STEAM_API_KEY: "${STEAM_API_KEY}"
+      SCREENSHOT_BASIC_TOKEN: "${SCREENSHOT_BASIC_TOKEN}"
+      FIVEMANAGE_API_KEY: "${FIVEMANAGE_API_KEY}"
+      TEBEX_SECRET: "${TEBEX_SECRET}"
+      RCON_ENABLED: "${RCON_ENABLED:-false}"
+      RCON_PASSWORD: "${RCON_PASSWORD}"
+
   mariadb:
     image: mariadb:${MARIADB_VERSION:-11.5.2}
     container_name: "fivem-mariadb"

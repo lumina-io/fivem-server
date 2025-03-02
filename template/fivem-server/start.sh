@@ -31,6 +31,7 @@ if [ -e "${SERVER_PATH}" ]; then
     cd ${SERVER_PATH}
 
     if [ -e "Makefile" ]; then
+        make generate-secrets
         make generate-metadata
         make generate-inventory
     fi
