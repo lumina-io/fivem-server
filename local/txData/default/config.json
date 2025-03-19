@@ -1,43 +1,23 @@
 {
-  "global": {
-    "serverName": "Lumina",
-    "language": "en",
-    "menuEnabled": true,
-    "menuAlignRight": false,
-    "menuPageKey": "Tab",
-    "hideDefaultAnnouncement": false,
-    "hideDefaultDirectMessage": false,
-    "hideDefaultWarning": false,
-    "hideDefaultScheduledRestartWarning": false,
-    "hideAdminInPunishments": true,
-    "hideAdminInMessages": true
+  "version": 2,
+  "general": {
+    "serverName": "Lumina"
   },
-  "logger": {},
-  "monitor": {
-    "restarterSchedule": [],
+  "server": {
+    "dataPath": "/app/fivem/txData/lumina/",
+    "cfgPath": "/app/fivem/txData/lumina/server.cfg"
+  },
+  "restarter": {
     "resourceStartingTolerance": 120
   },
-  "playerDatabase": {
-    "onJoinCheckBan": true,
-    "whitelistMode": "disabled",
-    "whitelistedDiscordRoles": [],
-    "whitelistRejectionMessage": "Please join http://discord.gg/example and request to be whitelisted.",
-    "requiredBanHwidMatches": 1,
-    "banRejectionMessage": "You can join http://discord.gg/example to appeal this ban."
-  },
-  "webServer": {
-    "disableNuiSourceCheck": false
-  },
   "discordBot": {
-    "enabled": false,
-    "embedJson": "{\n  \"title\": \"{{serverName}}\",\n  \"url\": \"{{serverBrowserUrl}}\",\n  \"description\": \"You can configure this embed in `txAdmin > Settings > Discord Bot`, and edit everything from it (except footer).\",\n  \"fields\": [\n    {\n      \"name\": \"> STATUS\",\n      \"value\": \"```\\n{{statusString}}\\n```\",\n      \"inline\": true\n    },\n    {\n      \"name\": \"> PLAYERS\",\n      \"value\": \"```\\n{{serverClients}}/{{serverMaxClients}}\\n```\",\n      \"inline\": true\n    },\n    {\n      \"name\": \"> F8 CONNECT COMMAND\",\n      \"value\": \"```\\nconnect 123.123.123.123\\n```\"\n    },\n    {\n      \"name\": \"> NEXT RESTART\",\n      \"value\": \"```\\n{{nextScheduledRestart}}\\n```\",\n      \"inline\": true\n    },\n    {\n      \"name\": \"> UPTIME\",\n      \"value\": \"```\\n{{uptime}}\\n```\",\n      \"inline\": true\n    }\n  ],\n  \"image\": {\n    \"url\": \"https://i.imgur.com/ZZRp4pj.png\"\n  },\n  \"thumbnail\": {\n    \"url\": \"https://i.imgur.com/9i9lvOp.png\"\n  }\n}",
-    "embedConfigJson": "{\n  \"onlineString\": \"🟢 Online\",\n  \"onlineColor\": \"#0BA70B\",\n  \"partialString\": \"🟡 Partial\",\n  \"partialColor\": \"#FFF100\",\n  \"offlineString\": \"🔴 Offline\",\n  \"offlineColor\": \"#A70B28\",\n  \"buttons\": [\n    {\n      \"emoji\": \"1062338355909640233\",\n      \"label\": \"Connect\",\n      \"url\": \"{{serverJoinUrl}}\"\n    },\n    {\n      \"emoji\": \"1062339910654246964\",\n      \"label\": \"txAdmin Discord\",\n      \"url\": \"https://discord.gg/txAdmin\"\n    },\n    {\n      \"emoji\": \"😏\",\n      \"label\": \"ZAP-Hosting\",\n      \"url\": \"https://zap-hosting.com/txadmin6\"\n    }\n  ]\n}"
+    "embedJson": "{\"title\":\"{{serverName}}\",\"url\":\"{{serverBrowserUrl}}\",\"description\":\"You can configure this embed in `txAdmin > Settings > Discord Bot`, and edit everything from it (except footer).\",\"fields\":[{\"name\":\"> STATUS\",\"value\":\"```\\n{{statusString}}\\n```\",\"inline\":true},{\"name\":\"> PLAYERS\",\"value\":\"```\\n{{serverClients}}/{{serverMaxClients}}\\n```\",\"inline\":true},{\"name\":\"> F8 CONNECT COMMAND\",\"value\":\"```\\nconnect 123.123.123.123\\n```\"},{\"name\":\"> NEXT RESTART\",\"value\":\"```\\n{{nextScheduledRestart}}\\n```\",\"inline\":true},{\"name\":\"> UPTIME\",\"value\":\"```\\n{{uptime}}\\n```\",\"inline\":true}],\"image\":{\"url\":\"https://i.imgur.com/ZZRp4pj.png\"},\"thumbnail\":{\"url\":\"https://i.imgur.com/9i9lvOp.png\"}}",
+    "embedConfigJson": "{\"onlineString\":\"🟢 Online\",\"onlineColor\":\"#0BA70B\",\"partialString\":\"🟡 Partial\",\"partialColor\":\"#FFF100\",\"offlineString\":\"🔴 Offline\",\"offlineColor\":\"#A70B28\",\"buttons\":[{\"emoji\":\"1062338355909640233\",\"label\":\"Connect\",\"url\":\"{{serverJoinUrl}}\"},{\"emoji\":\"1062339910654246964\",\"label\":\"txAdmin Discord\",\"url\":\"https://discord.gg/txAdmin\"},{\"emoji\":\"😏\",\"label\":\"ZAP-Hosting\",\"url\":\"https://zap-hosting.com/txadmin6\"}]}"
   },
-  "fxRunner": {
-    "serverDataPath": "/app/fivem/txData/lumina/",
-    "cfgPath": "/app/fivem/txData/lumina/server.cfg",
-    "onesync": "on",
-    "autostart": true
+  "gameFeatures": {
+    "hideAdminInMessages": true
   },
-  "banTemplates": []
+  "whitelist": {
+    "mode": "adminOnly"
+  }
 }
