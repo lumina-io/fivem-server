@@ -2,7 +2,7 @@ services:
   fivem:
     image: ghcr.io/lumina-io/fivem-server:latest
     container_name: "fivem-server"
-    restart: "unless-stopped"
+    restart: "${RESTART_POLICY:-no}"
     network_mode: "host"
     tty: true
     build:
@@ -52,7 +52,7 @@ services:
   mariadb:
     image: mariadb:${MARIADB_VERSION:-11.5.2}
     container_name: "fivem-mariadb"
-    restart: "unless-stopped"
+    restart: "${RESTART_POLICY:-no}"
     network_mode: "host"
     command: ["--port", "${MYSQL_PORT}"]
     volumes:

@@ -2,6 +2,10 @@ export COMPOSE_BAKE=true
 # Server Config
 export USE_DEV="false"
 
+# Auto restart
+# Use for Production Environment
+# export RESTART_POLICY="unless-stopped"
+
 ## NOTE: DO NOT EDIT (use for directory name)
 export SERVER_ID="lumina"
 export SERVER_PATH="/app/fivem/txData/${SERVER_ID}"

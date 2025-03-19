@@ -4,14 +4,14 @@ networks:
     external: true
 services:
   fivem:
-    restart: "unless-stopped"
+    restart: "${RESTART_POLICY:-no}"
     network_mode: "bridge"
     ports:
       - 30120:30120
       - 40120:40120
 
   mariadb:
-    restart: "unless-stopped"
+    restart: "${RESTART_POLICY:-no}"
     network_mode: "bridge"
     ports:
       - ${MYSQL_PORT}:${MYSQL_PORT}
