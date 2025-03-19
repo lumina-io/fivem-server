@@ -1,26 +1,31 @@
-FROM debian:bookworm
-
+FROM alpine:latest AS download_assets
 ARG FIVEM_ARTIFACT_URL="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/"
+
+WORKDIR /fivem
+
+# Download fxserver
+RUN apk add --no-cache curl xq \
+    && _ARTIFACT=$(curl ${FIVEM_ARTIFACT_URL} | xq -q 'body > section > div > nav > a:nth-child(4)' -a 'href') \
+    && curl -#OL "${FIVEM_ARTIFACT_URL}/${_ARTIFACT}" \
+    && tar xvf ./fx.tar.xz \
+    && rm -rf fx.tar.xz
+
+# Prepare image
+FROM alpine:latest
 ARG USER_ID='0'
 ARG GROUP_ID='0'
 
-RUN apt-get update && \
-    apt-get install -yqq \
-    wget curl xz-utils make git lua5.4
+# useradd app --uid ${USER_ID} -U -s /bin/bash
+RUN apk add --no-cache bash libstdc++ libgcc make lua5.4 \
+    && ln -sf /usr/bin/lua5.4 /usr/bin/lua \
+    && if [ ${USER_ID} != "0" ]; then \
+    adduser app -u ${USER_ID} -h /app -s /bin/bash -D; \
+    fi
 
-RUN curl -sSL https://bit.ly/install-xq | bash && \
-    mv /usr/local/bin/xq /usr/bin/xq
-
-# Ensure user
-RUN useradd app --uid ${USER_ID} -U -s /bin/bash
 USER app
-
 WORKDIR /app/fivem
 
-RUN _ARTIFACT=$(curl ${FIVEM_ARTIFACT_URL} | xq -q 'body > section > div > nav > a:nth-child(4)' -a 'href') && \
-    wget "${FIVEM_ARTIFACT_URL}/${_ARTIFACT}" && \
-    tar xvf ./fx.tar.xz
-
+COPY --from=download_assets /fivem/ /app/fivem/
 COPY ./template/fivem-server/start.sh /app/fivem/start.sh
 
 CMD ["bash", "/app/fivem/start.sh"]
