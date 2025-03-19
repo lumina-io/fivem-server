@@ -1,3 +1,5 @@
+config.sh
+/backup
 /local/mysql
 /local/txData/admins.json
 /local/txData/*lumina*

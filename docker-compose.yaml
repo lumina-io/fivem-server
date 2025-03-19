@@ -25,7 +25,6 @@ services:
       # !!!
       UID: "${USER_ID:-0}"
       GID: "${GROUP_ID:-0}"
-      TXADMIN_PORT: 40120
       SERVER_PATH: "${SERVER_PATH}"
       DIRECT: "${DIRECT:-false}"
       DIRECT_DIR: "${SERVER_PATH}"
@@ -38,6 +37,17 @@ services:
       TEBEX_SECRET: "${TEBEX_SECRET}"
       RCON_ENABLED: "${RCON_ENABLED:-false}"
       RCON_PASSWORD: "${RCON_PASSWORD}"
+
+      # txAdmin
+      TXHOST_PROVIDER_NAME: "${SERVER_ID:-fxserver}"
+      TXHOST_TXA_URL: "https://localhost:40120"
+      TXADMIN_PORT: 40120
+      TXHOST_DEFAULT_CFXKEY: "${FXSERVER_LICENSE_KEY}"
+      TXHOST_DEFAULT_DBHOST: "${MYSQL_ADDRESS}"
+      TXHOST_DEFAULT_DBPORT: "${MYSQL_PORT}"
+      TXHOST_DEFAULT_DBUSER: "${MYSQL_USER}"
+      TXHOST_DEFAULT_DBPASS: "${MYSQL_PASSWORD}"
+      TXHOST_DEFAULT_DBNAME: "${MYSQL_DATABASE}"
 
   mariadb:
     image: mariadb:${MARIADB_VERSION:-11.5.2}
