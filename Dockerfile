@@ -16,7 +16,7 @@ ARG USER_ID='0'
 ARG GROUP_ID='0'
 
 # useradd app --uid ${USER_ID} -U -s /bin/bash
-RUN apk add --no-cache bash libstdc++ libgcc make lua5.4 \
+RUN apk add --no-cache bash libstdc++ libgcc make lua5.4 tzdata \
     && ln -sf /usr/bin/lua5.4 /usr/bin/lua \
     && if [ ${USER_ID} != "0" ]; then \
     adduser app -u ${USER_ID} -h /app -s /bin/bash -D; \
