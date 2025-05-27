@@ -50,7 +50,7 @@ services:
       TXHOST_DEFAULT_DBNAME: "${MYSQL_DATABASE}"
 
   mariadb:
-    image: mariadb:${MARIADB_VERSION:-11.5.2}
+    image: mariadb:${MARIADB_VERSION:-lts}
     container_name: "fivem-mariadb"
     restart: "${RESTART_POLICY:-no}"
     network_mode: "host"
