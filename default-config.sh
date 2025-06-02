@@ -1,4 +1,3 @@
-export COMPOSE_BAKE=true
 # Server Config
 export USE_DEV="false"
 
