@@ -19,5 +19,5 @@ if [ "$DIRECT" == "true" ]; then
     cd $DIRECT_DIR
     bash ${_base}/run.sh +exec server.cfg
 else
-    bash ./run.sh +set txAdminPort
+    bash ./run.sh
 fi
