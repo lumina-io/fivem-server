@@ -10,6 +10,21 @@ RUN apk add --no-cache curl xq \
     && tar xvf ./fx.tar.xz \
     && rm -rf fx.tar.xz
 
+# For debug: direct download
+#ARG DIRECT_URL="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/16237-081a76900402908b96facbdbc3d2299ebf1c4714/fx.tar.xz"
+#RUN apk add --no-cache curl \
+#    && curl -#OL "${DIRECT_URL}" \
+#    && tar xvf ./fx.tar.xz \
+#    && rm -rf fx.tar.xz
+
+FROM golang:latest AS build_utils
+WORKDIR /app
+COPY ./kontra/go.mod ./kontra/go.sum /app/
+RUN go mod download
+
+COPY ./kontra .
+RUN go build -a -v -o /kontra ./main.go
+
 # Prepare image
 FROM alpine:latest
 ARG USER_ID='0'
@@ -25,6 +40,7 @@ RUN apk add --no-cache bash libstdc++ libgcc make lua5.4 tzdata \
 USER app
 WORKDIR /app/fivem
 
+COPY --from=build_utils /kontra /bin/kontra
 COPY --from=download_assets /fivem/ /app/fivem/
 COPY ./template/fivem-server/start.sh /app/fivem/start.sh
 

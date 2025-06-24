@@ -17,7 +17,7 @@ export TXHOST_TXA_PORT=${TXADMIN_PORT:-40120}
 
 if [ "$DIRECT" == "true" ]; then
     cd $DIRECT_DIR
-    bash ${_base}/run.sh +exec server.cfg
+    kontra bash ${_base}/run.sh +exec server.cfg +exec set onesync on
 else
-    bash ./run.sh
+    kontra bash ./run.sh
 fi
