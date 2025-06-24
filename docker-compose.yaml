@@ -28,7 +28,7 @@ services:
       SERVER_PATH: "${SERVER_PATH}"
       DIRECT: "${DIRECT:-false}"
       DIRECT_DIR: "${SERVER_PATH}"
-
+      TXHOST_TMP_HIDE_ADS: "true"
       DATABASE_URL: "${DATABASE_URL}"
       FXSERVER_LICENSE_KEY: "${FXSERVER_LICENSE_KEY}"
       STEAM_API_KEY: "${STEAM_API_KEY}"
