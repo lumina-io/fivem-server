@@ -4,92 +4,92 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"os/exec"
 	"os/signal"
-	"strings"
+	"sync"
 	"syscall"
-	"time"
 
-	"github.com/fatih/color"
+	"github.com/lumina-io/kontra/internal/logging"
 )
 
-func StdPrint(args ...string) {
-	currentTime := time.Now()
-	d := currentTime.Format(time.RFC3339)
-	fmt.Println(color.CyanString(d), strings.Join(args, " "))
-}
-
-func ErrPrint(args ...string) {
-	currentTime := time.Now()
-	d := currentTime.Format(time.RFC3339)
-	fmt.Println(color.RedString(d), strings.Join(args, " "))
-}
-
-func WarnPrint(args ...string) {
-	currentTime := time.Now()
-	d := currentTime.Format(time.RFC3339)
-	fmt.Println(color.YellowString(d), strings.Join(args, " "))
-}
-
-func reader(scanner *bufio.Scanner, channel chan string) {
-	scanner.Split(bufio.ScanLines)
+func forwardOutput(scanner *bufio.Scanner, logFunc func(string), wg *sync.WaitGroup) {
+	defer wg.Done()
 	for scanner.Scan() {
-		channel <- scanner.Text()
+		logFunc(scanner.Text())
+	}
+}
+
+func forwardInput(stdin io.Writer) {
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		fmt.Fprintf(stdin, "%s\n", scanner.Text())
 	}
 }
 
 func main() {
+	handler := logging.NewSimpleHandler(os.Stdout, slog.LevelInfo)
+	logger := slog.New(handler)
+
+	// Signal Handler
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
+
+	// Executor
 	cmd := exec.Command(os.Args[1], os.Args[2:]...)
-	stdin, _ := cmd.StdinPipe()
+
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
+	stdin, _ := cmd.StdinPipe()
 
-	defer stdin.Close()
 	defer stdout.Close()
 	defer stderr.Close()
+	defer stdin.Close()
 
 	cmd.Start()
 
-	inputScanner := bufio.NewScanner(os.Stdin)
-	outScanner := bufio.NewScanner(stdout)
-	errScanner := bufio.NewScanner(stderr)
+	var wg sync.WaitGroup
+	wg.Add(2)
 
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGINT)
+	go forwardOutput(bufio.NewScanner(stdout), func(msg string) { logger.Info(msg) }, &wg)
+	go forwardOutput(bufio.NewScanner(stderr), func(msg string) { logger.Error(msg) }, &wg)
 
-	stdinChan := make(chan string)
-	stdoutChan := make(chan string)
-	stderrChan := make(chan string)
+	go forwardInput(stdin)
 
-	go reader(inputScanner, stdinChan)
-	go reader(outScanner, stdoutChan)
-	go reader(errScanner, stderrChan)
+	// プロセス終了またはシグナル受信を待機
+	done := make(chan bool, 1)
 
-	finished := false
-	done := make(chan bool)
+	// プロセス終了を監視
 	go func() {
-		for !finished {
-			select {
-			case line := <-stdinChan:
-				io.WriteString(stdin, fmt.Sprintf("%v\n", line))
-			case line := <-stdoutChan:
-				StdPrint(line)
-			case line := <-stderrChan:
-				ErrPrint(line)
-			case receivedSignal := <-sig:
-				WarnPrint(fmt.Sprintf("Signal Received: %v\n", receivedSignal.String()))
-				cmd.Process.Signal(receivedSignal)
-			case <-done:
-				finished = true
-			}
-		}
+		cmd.Wait()
+		done <- true
 	}()
 
-	cmd.Wait()
-	done <- true
+	// シグナルまたはプロセス終了を待つ
+	select {
+	case sig := <-sigChan:
+		logger.Warn(fmt.Sprintf("Signal received: %s", sig.String()))
+		logger.Info("Forwarding signal to child process")
+
+		// 子プロセスにシグナルを転送
+		if err := cmd.Process.Signal(sig); err != nil {
+			logger.Error(fmt.Sprintf("Failed to forward signal: %v", err))
+			// シグナル転送に失敗した場合は強制終了
+			cmd.Process.Kill()
+		}
+
+		// 子プロセスの終了を待つ
+		<-done
+
+	case <-done:
+		logger.Debug("Process finished normally")
+	}
+
+	// 出力処理完了まで待機
+	wg.Wait()
 
 	exitCode := cmd.ProcessState.ExitCode()
-	WarnPrint(fmt.Sprintf("Process exited: %d\n", exitCode))
+	logger.Warn(fmt.Sprintf("Process exited: %d", exitCode))
 	os.Exit(exitCode)
 }
