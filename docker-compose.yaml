@@ -55,6 +55,7 @@ services:
     restart: "${RESTART_POLICY:-no}"
     network_mode: "host"
     command: ["--port", "${MYSQL_PORT}"]
+    user: "${USER_ID:-0}:${GROUP_ID:-0}"
     volumes:
       - ./local/mysql:/var/lib/mysql
     environment:
