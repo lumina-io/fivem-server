@@ -56,11 +56,13 @@ RUN apk add --no-cache bash make lua5.4 tzdata libstdc++ \
     fi \
     && rm /etc/passwd- /etc/shadow-
 
+
+COPY --from=build_utils /kontra /bin/kontra
+COPY ./template/fivem-server/start.sh /app/fivem/start.sh
+
 USER app
 WORKDIR /app/fivem
 
-COPY --from=build_utils /kontra /bin/kontra
 COPY --from=download_assets /fivem/ /app/fivem/
-COPY ./template/fivem-server/start.sh /app/fivem/start.sh
 
 CMD ["bash", "/app/fivem/start.sh"]
