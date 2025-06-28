@@ -53,9 +53,7 @@ RUN apk add --no-cache bash make lua5.4 tzdata libstdc++ \
     && ln -sf /usr/bin/lua5.4 /usr/bin/lua \
     && if [ "${USER_ID}" != "0" ]; then \
     adduser app -u ${USER_ID} -h /app -s /bin/bash -D; \
-    fi \
-    && rm /etc/passwd- /etc/shadow-
-
+    fi
 
 COPY --from=build_utils /kontra /bin/kontra
 COPY ./template/fivem-server/start.sh /app/fivem/start.sh
