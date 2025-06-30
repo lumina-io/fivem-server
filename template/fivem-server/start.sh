@@ -7,17 +7,17 @@ if [ -e "${SERVER_PATH}" ]; then
 
     if [ -e "autorun.sh" ]; then
         echo ":: Running autorun.sh"
-        bash ./autorun.sh
+        kontra bash ./autorun.sh
     fi
 fi
 
 # Start Server
-cd ${_base}
 export TXHOST_TXA_PORT=${TXADMIN_PORT:-40120}
 
 if [ "$DIRECT" == "true" ]; then
-    cd $DIRECT_DIR
+    cd ${SERVER_PATH}
     kontra bash ${_base}/run.sh +exec server.cfg +set onesync on
 else
+    cd ${_base}
     kontra bash ./run.sh
 fi
