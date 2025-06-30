@@ -29,7 +29,7 @@ RUN FIVEM_ARTIFACT_BASE="https://runtime.fivem.net/artifacts/fivem/build_proot_l
         --exclude alpine/tmp \
         # --exclude alpine/usr \
         --exclude alpine/usr/bin \
-        --exclude alpine/usr/glibc-compat \
+        # --exclude alpine/usr/glibc-compat \
         --exclude alpine/usr/sbin \
         --exclude alpine/usr/share \
         --exclude alpine/usr/libexec \
@@ -42,14 +42,20 @@ COPY ./kontra/go.mod ./kontra/go.sum /app/
 RUN go mod download
 
 COPY ./kontra .
-RUN go build -a -v -o /kontra ./main.go
+RUN go build -a -v -o /kontra ./cmd/kontra
 
 # Prepare image
 FROM alpine:latest
 ARG USER_ID='0'
 ARG GROUP_ID='0'
 
-RUN apk add --no-cache bash make lua5.4 tzdata libstdc++ \
+ENV TXHOST_TXA_URL="http://localhost:40120"
+ENV TXHOST_TXA_PORT="40120"
+ENV TXHOST_TMP_HIDE_ADS="true"
+
+# libstdc++ -> for fxserver
+# gcompat -> glibc-compat (fxserver compat / kontra compat)
+RUN apk add --no-cache bash make lua5.4 tzdata libstdc++ gcompat \
     && ln -sf /usr/bin/lua5.4 /usr/bin/lua \
     && if [ "${USER_ID}" != "0" ]; then \
     adduser app -u ${USER_ID} -h /app -s /bin/bash -D; \
