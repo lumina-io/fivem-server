@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 cd "$(dirname "$0")" && _base=$PWD
 
@@ -7,15 +7,15 @@ if [ -e "${SERVER_PATH}" ]; then
 
     if [ -e "autorun.sh" ]; then
         echo ":: Running autorun.sh"
-        kontra bash ./autorun.sh
+        sh ./autorun.sh
     fi
 fi
 
 # Start Server
 if [ "$DIRECT" == "true" ]; then
     cd ${SERVER_PATH}
-    kontra bash ${_base}/run.sh +exec server.cfg +set onesync on
+    sh ${_base}/run.sh +exec server.cfg +set onesync on
 else
     cd ${_base}
-    kontra bash ./run.sh
+    sh ./run.sh
 fi

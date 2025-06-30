@@ -55,10 +55,10 @@ ENV TXHOST_TMP_HIDE_ADS="true"
 
 # libstdc++ -> for fxserver
 # gcompat -> glibc-compat (fxserver compat / kontra compat)
-RUN apk add --no-cache bash make lua5.4 tzdata libstdc++ gcompat \
+RUN apk add --no-cache lua5.4 tzdata libstdc++ gcompat \
     && ln -sf /usr/bin/lua5.4 /usr/bin/lua \
     && if [ "${USER_ID}" != "0" ]; then \
-    adduser app -u ${USER_ID} -h /app -s /bin/bash -D; \
+    adduser app -u ${USER_ID} -h /app -s /bin/sh -D; \
     fi
 
 COPY --from=build_utils /kontra /bin/kontra
@@ -69,4 +69,4 @@ WORKDIR /app/fivem
 
 COPY --from=download_assets /fivem/ /app/fivem/
 
-CMD ["bash", "/app/fivem/start.sh"]
+CMD ["kontra", "sh", "/app/fivem/start.sh"]
