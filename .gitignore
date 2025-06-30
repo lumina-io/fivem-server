@@ -1,6 +1,7 @@
 config.sh
 /backup
 /local/mysql
+/local/logs/*
 /local/txData/admins.json
 /local/txData/*lumina*
 /local/txData/default/logs/*
