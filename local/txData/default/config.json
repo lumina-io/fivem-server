@@ -19,5 +19,8 @@
   },
   "whitelist": {
     "mode": "adminOnly"
+  },
+  "logger": {
+    "fxserver": false
   }
 }
