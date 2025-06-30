@@ -13,6 +13,7 @@ services:
         GROUP_ID: ${GROUP_ID:-0}
     volumes:
       - ./local/txData:/app/fivem/txData
+      - ./local/logs:/app/fivem/logs
     depends_on:
       mariadb:
         condition: service_healthy
