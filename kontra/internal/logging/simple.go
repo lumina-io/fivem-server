@@ -14,11 +14,11 @@ type SimpleHandler struct {
 	logger *log.Logger
 }
 
-func NewSimpleHandler(out io.Writer, level slog.Level) *SimpleHandler {
+func NewSimpleHandler(out io.Writer) *SimpleHandler {
 	prefix := ""
 	h := &SimpleHandler{
 		Handler: slog.NewJSONHandler(out, &slog.HandlerOptions{
-			Level: level,
+			Level: slog.LevelInfo,
 		}),
 		logger: log.New(out, prefix, 0),
 	}
@@ -28,7 +28,6 @@ func NewSimpleHandler(out io.Writer, level slog.Level) *SimpleHandler {
 func (h *SimpleHandler) Handle(_ context.Context, record slog.Record) error {
 	ts := record.Time.Format("2006-01-02 15:04:05")
 	level := func() string {
-		// fmt.Sprintf("[%5s]", record.Level.String())
 		switch record.Level {
 		case slog.LevelInfo:
 			return color.GreenString("STDOUT")
@@ -40,6 +39,7 @@ func (h *SimpleHandler) Handle(_ context.Context, record slog.Record) error {
 			return record.Level.String()
 		}
 	}()
+
 	h.logger.Printf("%s %s: %s", color.CyanString(ts), level, record.Message)
 	return nil
 }
