@@ -12,8 +12,6 @@ if [ -e "${SERVER_PATH}" ]; then
 fi
 
 # Start Server
-export TXHOST_TXA_PORT=${TXADMIN_PORT:-40120}
-
 if [ "$DIRECT" == "true" ]; then
     cd ${SERVER_PATH}
     kontra bash ${_base}/run.sh +exec server.cfg +set onesync on
