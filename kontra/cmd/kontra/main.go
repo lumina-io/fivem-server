@@ -82,9 +82,20 @@ func main() {
 	// Executor
 	cmd := exec.Command(os.Args[1], os.Args[2:]...)
 
-	stdout, _ := cmd.StdoutPipe()
-	stderr, _ := cmd.StderrPipe()
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		panic(err)
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		panic(err)
+	}
+
 	stdin, _ := cmd.StdinPipe()
+	if err != nil {
+		panic(err)
+	}
 
 	defer stdout.Close()
 	defer stderr.Close()
