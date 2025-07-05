@@ -6,13 +6,20 @@ import (
 	"io"
 	"log"
 	"log/slog"
-
-	"github.com/fatih/color"
+	"regexp"
 )
+
+// ANSI color code regex pattern - matches escape sequences
+var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 type FileHandler struct {
 	slog.Handler
 	logger *log.Logger
+}
+
+// stripANSIColors removes ANSI color codes from text
+func stripANSIColors(text string) string {
+	return ansiRegex.ReplaceAllString(text, "")
 }
 
 func NewFileHandler(out io.Writer, level slog.Level) *FileHandler {
@@ -31,20 +38,23 @@ func (h *FileHandler) Handle(_ context.Context, record slog.Record) error {
 	level := func() string {
 		switch record.Level {
 		case slog.LevelInfo:
-			return color.GreenString("STDOUT")
+			return "STDOUT"
 		case slog.LevelWarn:
-			return color.YellowString("WARNING")
+			return "WARNING"
 		case slog.LevelError:
-			return color.RedString("STDERR")
+			return "STDERR"
 		default:
 			return record.Level.String()
 		}
 	}()
 
+	// Strip ANSI color codes from the message for clean JSON output
+	cleanMessage := stripANSIColors(record.Message)
+
 	json, _ := json.Marshal(map[string]any{
 		"time":    ts,
 		"level":   level,
-		"message": record.Message,
+		"message": cleanMessage,
 	})
 
 	h.logger.Print(string(json))
