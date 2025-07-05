@@ -92,7 +92,7 @@ func main() {
 		panic(err)
 	}
 
-	stdin, _ := cmd.StdinPipe()
+	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		panic(err)
 	}
