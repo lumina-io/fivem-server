@@ -18,6 +18,8 @@ services:
       mariadb:
         condition: service_healthy
     user: "${USER_ID:-0}:${GROUP_ID:-0}"
+    env_file:
+      - server-config.env
     environment:
       TZ: "Asia/Tokyo"
       # !!!
@@ -59,6 +61,8 @@ services:
     user: "${USER_ID:-0}:${GROUP_ID:-0}"
     volumes:
       - ./local/mysql:/var/lib/mysql
+    env_file:
+      - server-config.env
     environment:
       TZ: "Asia/Tokyo"
       # !!!
