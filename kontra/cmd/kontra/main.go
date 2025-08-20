@@ -66,19 +66,22 @@ func isFileClosedError(err error) bool {
 
 // handleProcessCompletion manages process termination and signal forwarding
 func handleProcessCompletion(cmd *exec.Cmd, sigChan <-chan os.Signal, done <-chan bool, logger *slog.Logger) {
-	select {
-	case sig := <-sigChan:
-		logger.Warn(fmt.Sprintf("Signal received: %s", sig.String()))
-		logger.Info("Forwarding signal to child process")
+	for {
+		select {
+		case sig := <-sigChan:
+			logger.Warn(fmt.Sprintf("Signal received: %s", sig.String()))
+			logger.Info("Forwarding signal to child process")
 
-		if err := cmd.Process.Signal(sig); err != nil {
-			logger.Error(fmt.Sprintf("Failed to forward signal: %v", err))
-			cmd.Process.Kill()
+			if err := cmd.Process.Signal(sig); err != nil {
+				logger.Error(fmt.Sprintf("Failed to forward signal: %v", err))
+				cmd.Process.Kill()
+				return
+			}
+
+		case <-done:
+			logger.Debug("Process finished normally")
+			return
 		}
-		<-done
-
-	case <-done:
-		logger.Debug("Process finished normally")
 	}
 }
 

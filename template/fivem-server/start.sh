@@ -14,8 +14,8 @@ fi
 # Start Server
 if [ "$DIRECT" == "true" ]; then
     cd ${SERVER_PATH}
-    sh ${_base}/run.sh +exec server.cfg +set onesync on
+    exec sh ${_base}/run.sh +exec server.cfg +set onesync on
 else
     cd ${_base}
-    sh ./run.sh
+    exec sh ./run.sh
 fi
