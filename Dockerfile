@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 FROM alpine:latest AS download_assets
 ARG FIVEM_ARTIFACT_URL
 
@@ -38,10 +40,10 @@ RUN FIVEM_ARTIFACT_BASE="https://runtime.fivem.net/artifacts/fivem/build_proot_l
 
 FROM golang:latest AS build_utils
 WORKDIR /app
-COPY ./kontra/go.mod ./kontra/go.sum /app/
+COPY --link ./kontra/go.mod ./kontra/go.sum /app/
 RUN go mod download
 
-COPY ./kontra .
+COPY --link ./kontra .
 RUN go build -a -v -o /kontra ./cmd/kontra
 
 # Prepare image
@@ -61,12 +63,12 @@ RUN apk add --no-cache lua5.4 tzdata libstdc++ gcompat \
     adduser app -u ${USER_ID} -h /app -s /bin/sh -D; \
     fi
 
-COPY --from=build_utils /kontra /bin/kontra
-COPY ./template/fivem-server/start.sh /app/fivem/start.sh
+COPY --link --from=build_utils /kontra /bin/kontra
+COPY --link ./template/fivem-server/start.sh /app/fivem/start.sh
 
 USER app
 WORKDIR /app/fivem
 
-COPY --from=download_assets /fivem/ /app/fivem/
+COPY --link --from=download_assets /fivem/ /app/fivem/
 
 CMD ["kontra", "sh", "/app/fivem/start.sh"]
