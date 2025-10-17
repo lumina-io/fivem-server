@@ -42,7 +42,7 @@ function _build() {
 }
 
 function _start_database() {
-    mkdir -p $PWD/local
+    mkdir -p $PWD/local/mysql
 
     _preexec
 
