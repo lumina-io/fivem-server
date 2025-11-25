@@ -40,11 +40,11 @@ RUN FIVEM_ARTIFACT_BASE="https://runtime.fivem.net/artifacts/fivem/build_proot_l
 
 FROM golang:latest AS build_utils
 WORKDIR /app
-COPY --link ./kontra/go.mod ./kontra/go.sum /app/
+COPY --link ./utils/kontra/go.mod ./utils/kontra/go.sum /app/
 RUN go mod download
 
-COPY --link ./kontra .
-RUN go build -a -v -o /kontra ./cmd/kontra
+COPY --link ./utils/kontra .
+RUN go build -a -v -o /utils/kontra ./cmd/kontra
 
 # Prepare image
 FROM alpine:latest
@@ -63,7 +63,7 @@ RUN apk add --no-cache lua5.4 tzdata libstdc++ gcompat \
     adduser app -u ${USER_ID} -h /app -s /bin/sh -D; \
     fi
 
-COPY --link --from=build_utils /kontra /bin/kontra
+COPY --link --from=build_utils /utils/kontra /bin/kontra
 COPY --link ./template/fivem-server/start.sh /app/fivem/start.sh
 
 USER app
