@@ -1,5 +1,5 @@
 config.sh
-server-config.env
+config.env
 /backup
 /local/mysql
 /local/logs/*

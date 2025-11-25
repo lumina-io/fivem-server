@@ -6,7 +6,7 @@ function compose() {
     # Set container use
     export USER_ID=$(id -u)
     export GROUP_ID=$(id -g)
-    docker compose --env-file ./server-config.env $@
+    docker compose --env-file ./config.env $@
 }
 
 function _preexec() {

@@ -19,7 +19,7 @@ services:
         condition: service_healthy
     user: "${USER_ID:-0}:${GROUP_ID:-0}"
     env_file:
-      - server-config.env
+      - config.env
     environment:
       TZ: "Asia/Tokyo"
       # !!!
@@ -39,7 +39,7 @@ services:
     volumes:
       - ./local/mysql:/var/lib/mysql
     env_file:
-      - server-config.env
+      - config.env
     environment:
       TZ: "Asia/Tokyo"
       # !!!
