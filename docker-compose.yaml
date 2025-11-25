@@ -28,36 +28,13 @@ services:
       # !!!
       UID: "${USER_ID:-0}"
       GID: "${GROUP_ID:-0}"
-      SERVER_PATH: "${SERVER_PATH}"
-      DIRECT: "${DIRECT:-false}"
-      DIRECT_DIR: "${SERVER_PATH}"
-      TXHOST_TMP_HIDE_ADS: "true"
-      DATABASE_URL: "${DATABASE_URL}"
-      FXSERVER_LICENSE_KEY: "${FXSERVER_LICENSE_KEY}"
-      STEAM_API_KEY: "${STEAM_API_KEY}"
-      SCREENSHOT_BASIC_TOKEN: "${SCREENSHOT_BASIC_TOKEN}"
-      FIVEMANAGE_API_KEY: "${FIVEMANAGE_API_KEY}"
-      TEBEX_SECRET: "${TEBEX_SECRET}"
-      RCON_ENABLED: "${RCON_ENABLED:-false}"
-      RCON_PASSWORD: "${RCON_PASSWORD}"
-
-      # txAdmin
-      TXHOST_PROVIDER_NAME: "${SERVER_ID:-fxserver}"
-      TXHOST_TXA_URL: "http://localhost:40120"
-      TXHOST_TXA_PORT: 40120
-      TXHOST_DEFAULT_CFXKEY: "${FXSERVER_LICENSE_KEY}"
-      TXHOST_DEFAULT_DBHOST: "${MYSQL_ADDRESS}"
-      TXHOST_DEFAULT_DBPORT: "${MYSQL_PORT}"
-      TXHOST_DEFAULT_DBUSER: "${MYSQL_USER}"
-      TXHOST_DEFAULT_DBPASS: "${MYSQL_PASSWORD}"
-      TXHOST_DEFAULT_DBNAME: "${MYSQL_DATABASE}"
 
   mariadb:
     image: mariadb:${MARIADB_VERSION:-lts}
     container_name: "fivem-mariadb"
     restart: "${RESTART_POLICY:-no}"
     network_mode: "host"
-    command: ["--port", "${MYSQL_PORT}"]
+    command: ["--port", "${MARIADB_PORT}"]
     user: "${USER_ID:-0}:${GROUP_ID:-0}"
     volumes:
       - ./local/mysql:/var/lib/mysql
@@ -69,18 +46,14 @@ services:
       # IF YOU WANT MOUNT VOLUMES,
       # UID/GID MUST BE Provide!!! (for directory / files permission)
       # !!!
-      UID: "${USER_ID:-0}"
-      GID: "${GROUP_ID:-0}"
-      MARIADB_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MARIADB_DATABASE: "${MYSQL_DATABASE}"
-      MARIADB_USER: "${MYSQL_USER}"
-      MARIADB_PASSWORD: "${MYSQL_PASSWORD}"
+      UID: "${USER_ID}"
+      GID: "${GROUP_ID}"
     healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-p${MARIADB_ROOT_PASSWORD}"]
       interval: "30s"
       timeout: "5s"
       retries: 5
       start_period: "10s"
     # Copy-pasted from https://github.com/docker-library/mariadb/issues/94
     #healthcheck:
-    #  test: ["CMD", "mysqladmin", "ping", "--silent",  "--user", "${MYSQL_USER}", "--password", "${MYSQL_PASSWORD}"]
+    #  test: ["CMD", "mysqladmin", "ping", "--silent",  "--user", "${MARIADB_USER}", "--password", "${MARIADB_PASSWORD}"]

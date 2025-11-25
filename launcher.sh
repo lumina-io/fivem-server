@@ -2,11 +2,12 @@
 set -e
 cd "$(dirname "$0")"
 
-source $PWD/config.sh
-
-# Set container user
-export USER_ID=`id -u`
-export GROUP_ID=`id -g`
+function compose() {
+    # Set container use
+    export USER_ID=$(id -u)
+    export GROUP_ID=$(id -g)
+    docker compose --env-file ./server-config.env $@
+}
 
 function _preexec() {
     if [ -e "$PWD/preexec.sh" ]; then
@@ -22,9 +23,9 @@ function _start() {
     echo ":: Starting container..."
     if [ "$USE_DEV" = "true" ]; then
         echo ":: USE_DEV enabled."
-        docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build
+        compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build
     else
-        docker compose up --build
+        compose up --build
     fi
 
     #echo ":: Attach console (exit: Ctrl+P, Ctrl+Q)"
@@ -33,12 +34,20 @@ function _start() {
 
 function _stop() {
     echo ":: Stopping container..."
-    docker compose down
+    compose down
 }
 
 function _build() {
     echo ":: Building image..."
-    docker compose build --no-cache
+    compose build --no-cache
+}
+
+function _config() {
+    compose config
+}
+
+function _compose() {
+    compose $@
 }
 
 function _start_database() {
@@ -49,15 +58,14 @@ function _start_database() {
     echo ":: Starting container..."
     if [ "$USE_DEV" = "true" ]; then
         echo ":: USE_DEV enabled."
-        docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up mariadb --build
+        compose -f docker-compose.yaml -f docker-compose.dev.yaml up mariadb --build
     else
-        docker compose up mariadb --build
+        compose up mariadb --build
     fi
 
     #echo ":: Attach console (exit: Ctrl+P, Ctrl+Q)"
     #docker start -ia "${CONTAINER_NAME}"
 }
-
 
 if [ "$1" = "start" ]; then
     _start
@@ -70,7 +78,12 @@ elif [ "$1" = "restart" ]; then
     _start
 elif [ "$1" = "build" ]; then
     _build
+elif [ "$1" = "config" ]; then
+    _config
+elif [ "$1" = "compose" ]; then
+    shift 1
+    _compose $@
 else
-    echo "Usage: launcher <start|start-database|stop|restart|build>"
+    echo "Usage: launcher <start|start-database|stop|restart|build|config|compose>"
     exit 1
 fi
