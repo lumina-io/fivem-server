@@ -25,6 +25,8 @@ func main() {
 	defer rcon.Close()
 
 	if len(os.Args) <= 1 {
+		fmt.Println("Usage: fxcon <command> [args...]")
+		os.Exit(1)
 	} else {
 		resp, err := rcon.Send(strings.Join(os.Args[1:], " "))
 		if err != nil {
