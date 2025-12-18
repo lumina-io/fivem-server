@@ -21,7 +21,7 @@ type Rcon struct {
 	timeouts       map[string]time.Duration
 }
 
-const respBufSiz = 65536
+const respBufSiz = 4110
 
 func New(host string, port int, password string) (*Rcon, error) {
 	if password == "" {
