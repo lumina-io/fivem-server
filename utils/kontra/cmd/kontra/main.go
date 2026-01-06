@@ -9,9 +9,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"strings"
-	"sync"
 	"syscall"
-	"time"
 
 	"github.com/lumina-io/kontra/internal/logging"
 	slogmulti "github.com/samber/slog-multi"
@@ -20,13 +18,6 @@ import (
 
 // Configuration constants
 const (
-	// Buffer configuration
-	initialBufSize = 64 * 1024        // 64KB initial buffer - efficient for most logs
-	maxTokenSize   = 10 * 1024 * 1024 // 10MB max token size - handles large lines
-
-	// Timeout configuration
-	outputProcessingTimeout = 10 * time.Second // Max wait for output processing
-
 	// Log rotation configuration
 	maxLogSizeMB  = 1    // 1MB max log file size
 	maxLogBackups = 10   // Keep 10 backup files
@@ -36,12 +27,8 @@ const (
 
 // forwardOutput efficiently processes and logs output from a reader
 // Memory is released immediately after each line is logged
-func forwardOutput(reader io.Reader, logger *slog.Logger, isError bool, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func forwardOutput(reader io.Reader, logger *slog.Logger, isError bool) {
 	scanner := bufio.NewScanner(reader)
-	buf := make([]byte, initialBufSize)
-	scanner.Buffer(buf, maxTokenSize)
 
 	for scanner.Scan() {
 		lineText := scanner.Text()
@@ -67,8 +54,8 @@ func isFileClosedError(err error) bool {
 // handleProcessCompletion manages process termination and signal forwarding
 func handleProcessCompletion(cmd *exec.Cmd, sigChan <-chan os.Signal, done <-chan bool, logger *slog.Logger) {
 	for {
-		select {
-		case sig := <-sigChan:
+		if cmd.Process != nil {
+			sig := <-sigChan
 			logger.Warn(fmt.Sprintf("Signal received: %s", sig.String()))
 			logger.Info("Forwarding signal to child process")
 
@@ -77,27 +64,7 @@ func handleProcessCompletion(cmd *exec.Cmd, sigChan <-chan os.Signal, done <-cha
 				cmd.Process.Kill()
 				return
 			}
-
-		case <-done:
-			logger.Debug("Process finished normally")
-			return
 		}
-	}
-}
-
-// waitForOutputCompletion waits for all output processing with timeout
-func waitForOutputCompletion(outputWg *sync.WaitGroup, logger *slog.Logger) {
-	outputDone := make(chan struct{})
-	go func() {
-		outputWg.Wait()
-		close(outputDone)
-	}()
-
-	select {
-	case <-outputDone:
-		// All output processed successfully
-	case <-time.After(outputProcessingTimeout):
-		logger.Warn("Output processing timeout - some output may be lost")
 	}
 }
 
@@ -136,10 +103,6 @@ func main() {
 	validateArgs()
 	logger := createLogger()
 
-	// Signal Handler
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
-
 	// Executor
 	cmd := exec.Command(os.Args[1], os.Args[2:]...)
 
@@ -147,49 +110,62 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer stdout.Close()
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		panic(err)
 	}
+	defer stderr.Close()
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		panic(err)
 	}
-
 	defer stdin.Close()
 
-	done := make(chan bool, 1)
-	var outputWg sync.WaitGroup
-
-	// Set up goroutines before starting the process
-	outputWg.Add(2)
-	go forwardOutput(stdout, logger, false, &outputWg)
-	go forwardOutput(stderr, logger, true, &outputWg)
-	go forwardInput(stdin)
-
-	// Start the process after goroutines are ready
-	err = cmd.Start()
-	if err != nil {
-		panic(err)
-	}
+	done := make(chan bool, 2)
 
 	go func() {
-		cmd.Wait()
+		forwardOutput(stdout, logger, false)
 		done <- true
 	}()
 
-	handleProcessCompletion(cmd, sigChan, done, logger)
+	go func() {
+		forwardOutput(stderr, logger, true)
+		done <- true
+	}()
 
-	waitForOutputCompletion(&outputWg, logger)
+	go forwardInput(stdin)
 
-	exitCode := cmd.ProcessState.ExitCode()
-	if exitCode != 0 {
-		logger.Warn(fmt.Sprintf("Process exited: %d", exitCode))
-	} else {
-		logger.Debug("Process exited normally")
+	// Signal Handler
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
+
+	go func() {
+		handleProcessCompletion(cmd, sigChan, done, logger)
+	}()
+
+	if err := cmd.Start(); err != nil {
+		panic(err)
 	}
 
-	os.Exit(exitCode)
+	// Wait stdout/stderr
+	<-done
+	<-done
+
+	err = cmd.Wait()
+
+	signal.Stop(sigChan)
+	close(sigChan)
+
+	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			exitCode := exitErr.ExitCode()
+			logger.Warn(fmt.Sprintf("Process exited: %d", exitCode))
+			os.Exit(exitCode)
+		}
+		logger.Error(fmt.Sprintf("Command execution failed: %v", err))
+		os.Exit(1)
+	}
 }
