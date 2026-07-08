@@ -6,11 +6,42 @@ ARG FIVEM_ARTIFACT_URL
 WORKDIR /fivem
 
 # Download fxserver
-RUN FIVEM_ARTIFACT_BASE="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/" \
-    && if [ "${FIVEM_ARTIFACT_URL}" = "" ]; then \
-        apk add --no-cache xq; \
-        _ARTIFACT=$(wget -O- ${FIVEM_ARTIFACT_BASE} | xq -q 'body > section > div > nav > a:nth-child(4)' -a 'href'); \
-        FIVEM_ARTIFACT_URL="${FIVEM_ARTIFACT_BASE}/${_ARTIFACT}"; \
+# RUN FIVEM_ARTIFACT_BASE="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/" \
+#     && if [ "${FIVEM_ARTIFACT_URL}" = "" ]; then \
+#         apk add --no-cache xq; \
+#         _ARTIFACT=$(wget -O- ${FIVEM_ARTIFACT_BASE} | xq -q 'body > section > div > nav > a:nth-child(4)' -a 'href'); \
+#         FIVEM_ARTIFACT_URL="${FIVEM_ARTIFACT_BASE}/${_ARTIFACT}"; \
+#     fi \
+#     && wget -O- "${FIVEM_ARTIFACT_URL}" \
+#     | tar xvJ \
+#         --exclude alpine/bin \
+#         --exclude alpine/dev \
+#         --exclude alpine/etc \
+#         --exclude alpine/home \
+#         # --exclude alpine/lib \
+#         --exclude alpine/lib64 \
+#         --exclude alpine/media \
+#         --exclude alpine/mnt \
+#         --exclude alpine/proc \
+#         --exclude alpine/root \
+#         --exclude alpine/run \
+#         --exclude alpine/sbin \
+#         --exclude alpine/srv \
+#         --exclude alpine/sys \
+#         --exclude alpine/tmp \
+#         # --exclude alpine/usr \
+#         --exclude alpine/usr/bin \
+#         # --exclude alpine/usr/glibc-compat \
+#         --exclude alpine/usr/sbin \
+#         --exclude alpine/usr/share \
+#         --exclude alpine/usr/libexec \
+#         --exclude alpine/utils \
+#         --exclude alpine/var
+
+RUN if [ "${FIVEM_ARTIFACT_URL}" = "" ]; then \
+        FIVEM_ARTIFACT_API="https://artifacts.jgscripts.com/jsonv2"; \
+        apk add --no-cache jq; \
+        FIVEM_ARTIFACT_URL=$(wget -O- ${FIVEM_ARTIFACT_API} | jq -cr .linuxDownloadLink); \
     fi \
     && wget -O- "${FIVEM_ARTIFACT_URL}" \
     | tar xvJ \
@@ -37,6 +68,7 @@ RUN FIVEM_ARTIFACT_BASE="https://runtime.fivem.net/artifacts/fivem/build_proot_l
         --exclude alpine/usr/libexec \
         --exclude alpine/utils \
         --exclude alpine/var
+
 
 FROM golang:latest AS build_kontra
 WORKDIR /app
